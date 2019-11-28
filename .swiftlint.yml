@@ -1,0 +1,126 @@
+disabled_rules:
+  - nesting
+  - redundant_string_enum_value
+  - superfluous_disable_command
+  - switch_case_alignment
+  - todo
+  - trailing_comma
+  - type_body_length
+  - vertical_parameter_alignment
+
+opt_in_rules:
+  - array_init
+  - closure_end_indentation
+  - contains_over_first_not_nil
+  - empty_count
+  - explicit_enum_raw_value
+  - explicit_init
+  - fatal_error_message
+  - first_where
+  - force_unwrapping
+  - implicit_return
+  - literal_expression_end_indentation
+  - operator_usage_whitespace
+  - overridden_super_call
+  - override_in_extension
+  - private_outlet
+  - redundant_nil_coalescing
+  - sorted_first_last
+  - strict_fileprivate
+  - trailing_closure
+  - unneeded_parentheses_in_closure_argument
+
+excluded:
+  - Pods
+
+force_cast: error
+force_try: error
+force_unwrapping: error
+
+trailing_whitespace:
+  ignores_empty_lines: false
+  severity: warning
+trailing_newline: error
+trailing_semicolon: error
+
+vertical_whitespace:
+  max_empty_lines: 1
+  severity: warning
+
+comma: error
+colon:
+  severity: error
+opening_brace: error
+empty_count: error
+legacy_constructor: error
+statement_position:
+  statement_mode: default
+  severity: error
+legacy_constant: error
+
+type_name:
+  min_length: 4
+  max_length:
+    warning: 50
+    error: 50
+  excluded:
+    - T
+    - Log
+
+identifier_name:
+  max_length:
+    warning: 50
+    error: 50
+  min_length:
+    error: 3
+  excluded:
+    - i
+    - x
+    - y
+    - z
+    - at
+    - id
+    - db
+    - rs
+    - to
+    - in
+    - on
+    - me
+    - av
+
+function_parameter_count:
+  warning: 10
+  error: 10
+
+line_length:
+  warning: 120
+  ignores_function_declarations: true
+  ignores_comments: true
+  ignores_interpolated_strings: true
+  ignores_urls: true
+  error: 140
+
+function_body_length:
+  warning: 100
+  error: 200
+
+file_length:
+  warning: 500
+  error: 1000
+
+cyclomatic_complexity:
+  warning: 20
+  error: 30
+
+large_tuple:
+  warning: 4
+  error: 5
+
+reporter: 'xcode'
+
+custom_rules:
+  comments_space:
+    name: 'Space After Comment'
+    regex: '(^ *//\w+)'
+    message: 'There should be a space after //'
+    severity: warning
