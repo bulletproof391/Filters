@@ -9,21 +9,25 @@
 /* Begin PBXBuildFile section */
 		0A0B5C8A2390549D009FCC89 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0B5C892390549D009FCC89 /* AppDelegate.swift */; };
 		0A0B5C8C2390549D009FCC89 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0B5C8B2390549D009FCC89 /* SceneDelegate.swift */; };
-		0A0B5C8E2390549D009FCC89 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0B5C8D2390549D009FCC89 /* ViewController.swift */; };
+		0A0B5C8E2390549D009FCC89 /* FrontCameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0B5C8D2390549D009FCC89 /* FrontCameraViewController.swift */; };
 		0A0B5C912390549D009FCC89 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A0B5C8F2390549D009FCC89 /* Main.storyboard */; };
 		0A0B5C932390549F009FCC89 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A0B5C922390549F009FCC89 /* Assets.xcassets */; };
 		0A0B5C962390549F009FCC89 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A0B5C942390549F009FCC89 /* LaunchScreen.storyboard */; };
+		0A38D3F523905DC200179218 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A38D3F423905DC200179218 /* CameraManager.swift */; };
+		0A38D3F8239065BD00179218 /* CameraPreviewLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A38D3F7239065BD00179218 /* CameraPreviewLayer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0A0B5C862390549D009FCC89 /* Filters.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Filters.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A0B5C892390549D009FCC89 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0A0B5C8B2390549D009FCC89 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		0A0B5C8D2390549D009FCC89 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		0A0B5C8D2390549D009FCC89 /* FrontCameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrontCameraViewController.swift; sourceTree = "<group>"; };
 		0A0B5C902390549D009FCC89 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0A0B5C922390549F009FCC89 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0A0B5C952390549F009FCC89 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0A0B5C972390549F009FCC89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0A38D3F423905DC200179218 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		0A38D3F7239065BD00179218 /* CameraPreviewLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewLayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,13 +62,47 @@
 			children = (
 				0A0B5C892390549D009FCC89 /* AppDelegate.swift */,
 				0A0B5C8B2390549D009FCC89 /* SceneDelegate.swift */,
-				0A0B5C8D2390549D009FCC89 /* ViewController.swift */,
-				0A0B5C8F2390549D009FCC89 /* Main.storyboard */,
+				0A38D3F2239057D800179218 /* UI */,
+				0A38D3F323905DB200179218 /* BusinessLogic */,
+				0A38D3F1239057AD00179218 /* Resources */,
+			);
+			path = Filters;
+			sourceTree = "<group>";
+		};
+		0A38D3F1239057AD00179218 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
 				0A0B5C922390549F009FCC89 /* Assets.xcassets */,
 				0A0B5C942390549F009FCC89 /* LaunchScreen.storyboard */,
 				0A0B5C972390549F009FCC89 /* Info.plist */,
 			);
-			path = Filters;
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		0A38D3F2239057D800179218 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				0A0B5C8F2390549D009FCC89 /* Main.storyboard */,
+				0A0B5C8D2390549D009FCC89 /* FrontCameraViewController.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		0A38D3F323905DB200179218 /* BusinessLogic */ = {
+			isa = PBXGroup;
+			children = (
+				0A38D3F62390659800179218 /* Camera */,
+			);
+			path = BusinessLogic;
+			sourceTree = "<group>";
+		};
+		0A38D3F62390659800179218 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				0A38D3F423905DC200179218 /* CameraManager.swift */,
+				0A38D3F7239065BD00179218 /* CameraPreviewLayer.swift */,
+			);
+			path = Camera;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -160,8 +198,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A0B5C8E2390549D009FCC89 /* ViewController.swift in Sources */,
+				0A0B5C8E2390549D009FCC89 /* FrontCameraViewController.swift in Sources */,
 				0A0B5C8A2390549D009FCC89 /* AppDelegate.swift in Sources */,
+				0A38D3F8239065BD00179218 /* CameraPreviewLayer.swift in Sources */,
+				0A38D3F523905DC200179218 /* CameraManager.swift in Sources */,
 				0A0B5C8C2390549D009FCC89 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -308,7 +348,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PJD957SY8C;
-				INFOPLIST_FILE = Filters/Info.plist;
+				INFOPLIST_FILE = Filters/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -327,7 +367,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = PJD957SY8C;
-				INFOPLIST_FILE = Filters/Info.plist;
+				INFOPLIST_FILE = Filters/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
