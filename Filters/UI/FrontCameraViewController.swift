@@ -17,7 +17,7 @@ final class FrontCameraViewController: UIViewController {
 
     // MARK: - Public properties
 
-    let cameraManager = CameraManager()
+    let cameraManager: CameraManagerable & ImageFiltering = CameraManager()
 
     // MARK: - View controller lifecycle
 
@@ -36,20 +36,47 @@ final class FrontCameraViewController: UIViewController {
 
     private func configureViewController() {
         prepareCameraUsage()
+        configurePreview()
         configureButton()
     }
 
     private func prepareCameraUsage() {
         cameraManager.previewLayer = cameraPreviewView
+        cameraManager.initFilters(with: FilterName.allCases.map { String($0.rawValue) })
 
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             self?.cameraManager.checkAuthorizationStatus()
         }
     }
 
+    private func configurePreview() {
+        let leftSwipeGesture = UISwipeGestureRecognizer(target: self,
+                                                        action: #selector(swipeGestureHandler(gestureRecognizer:)))
+        leftSwipeGesture.direction = .left
+
+        let rightSwipeGesture = UISwipeGestureRecognizer(target: self,
+                                                         action: #selector(swipeGestureHandler(gestureRecognizer:)))
+        rightSwipeGesture.direction = .right
+
+        cameraPreviewView.addGestureRecognizer(leftSwipeGesture)
+        cameraPreviewView.addGestureRecognizer(rightSwipeGesture)
+        cameraPreviewView.isUserInteractionEnabled = true
+    }
+
     private func configureButton() {
         captureImageButton.setTitle(nil)
         captureImageButton.backgroundColor = UIColor.white
         captureImageButton.layer.cornerRadius = captureImageButton.bounds.width / 2
+    }
+
+    @objc private func swipeGestureHandler(gestureRecognizer: UISwipeGestureRecognizer) {
+        switch gestureRecognizer.direction {
+        case .left:
+            cameraManager.applyFilter(direction: .next)
+        case .right:
+            cameraManager.applyFilter(direction: .previous)
+        default:
+            break
+        }
     }
 }

@@ -16,11 +16,11 @@ class DefaultCIFilter {
     var isPrepared = false
     private(set) var outputFormatDescription: CMFormatDescription?
     private(set) var inputFormatDescription: CMFormatDescription?
+    private(set) var filter: CIFilter?
 
     // MARK: - Private properties
 
-    private var ciContext: CIContext?
-    private var filter: CIFilter?
+    private var ciContext: CIContext
     private var outputColorSpace: CGColorSpace?
     private var outputPixelBufferPool: CVPixelBufferPool?
 
@@ -48,11 +48,8 @@ class DefaultCIFilter {
     }
 
     func render(pixelBuffer: CVPixelBuffer) -> CVPixelBuffer? {
-        guard let filter = filter,
-            let ciContext = ciContext,
-            isPrepared else {
-                assertionFailure("Invalid state: Not prepared")
-                return nil
+        guard let filter = filter, isPrepared else {
+            return pixelBuffer
         }
 
         let sourceImage = CIImage(cvImageBuffer: pixelBuffer)
