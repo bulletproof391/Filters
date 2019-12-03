@@ -22,12 +22,13 @@ final class CameraManager: NSObject, CameraManagerable {
 
     let captureSession = AVCaptureSession()
     weak var previewLayer: PreviewMetalView?
-
-    // MARK: - Private proeprties
-
+    
     var currentFilter: DefaultCIFilter?
     var ciFilters = [DefaultCIFilter]()
     var filterIndex: Int = 0
+
+    // MARK: - Private proeprties
+
     private var dataOutputQueue = DispatchQueue(label: "OutputQueue",
                                                 qos: .userInitiated,
                                                 attributes: [],
