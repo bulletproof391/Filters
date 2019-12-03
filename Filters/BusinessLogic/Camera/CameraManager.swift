@@ -10,19 +10,24 @@ import AVFoundation
 import Photos
 import UIKit
 
-// swiftlint:disable force_unwrapping
-final class CameraManager: NSObject {
+protocol CameraManagerable: AnyObject {
+    var previewLayer: PreviewMetalView? { get set }
+    func checkAuthorizationStatus()
+    func captureImage()
+}
+
+final class CameraManager: NSObject, CameraManagerable {
 
     // MARK: - Private proeprties
 
     let captureSession = AVCaptureSession()
     weak var previewLayer: PreviewMetalView?
 
-    // TODO: Remove later
-    var currentFilter = DefaultCIFilter(ciContext: CIContext(), filterName: "CICrystallize")
-
     // MARK: - Private proeprties
 
+    var currentFilter: DefaultCIFilter?
+    var ciFilters = [DefaultCIFilter]()
+    var filterIndex: Int = 0
     private var dataOutputQueue = DispatchQueue(label: "OutputQueue",
                                                 qos: .userInitiated,
                                                 attributes: [],
@@ -73,22 +78,10 @@ final class CameraManager: NSObject {
             photoSettings.isHighResolutionPhotoEnabled = true
             photoSettings.photoQualityPrioritization = .balanced
 
-            let photoCaptureProcessor = PhotoCaptureProcessor(
-                with: photoSettings,
-                willCapturePhotoAnimation: {
-                    // Flash the screen to signal that AVCam took a photo.
-                    DispatchQueue.main.async {
-                        self.previewLayer?.layer.opacity = 0
-                        UIView.animate(withDuration: 0.25) {
-                            self.previewLayer?.layer.opacity = 1
-                        }
-                    }
-                },
-                completionHandler: { photoCaptureProcessor in
-                    // When the capture is complete, remove a reference to the photo capture delegate so it can be deallocated
-                    self.inProgressPhotoCaptureDelegates[photoCaptureProcessor.requestedPhotoSettings.uniqueID] = nil
-                }
-            )
+            let photoCaptureProcessor = PhotoCaptureProcessor(with: photoSettings,
+                                                              willCapturePhotoAnimation: self.animatePhotoCapture,
+                                                              applyFilterHandler: self.applyFilter,
+                                                              completionHandler: self.captureDidFinish)
 
             let instanceId = photoCaptureProcessor.requestedPhotoSettings.uniqueID
             self.inProgressPhotoCaptureDelegates[instanceId] = photoCaptureProcessor
@@ -145,6 +138,35 @@ final class CameraManager: NSObject {
 
         return true
     }
+
+    private func animatePhotoCapture() {
+        DispatchQueue.main.async { [weak self] in
+            self?.previewLayer?.layer.opacity = 0
+
+            UIView.animate(withDuration: 0.25) {
+                self?.previewLayer?.layer.opacity = 1
+            }
+        }
+    }
+
+    private func applyFilter(_ photo: AVCapturePhoto) -> Data? {
+        // Applying filter
+        let photoData = photo.fileDataRepresentation()
+        guard let filter = currentFilter?.filter else { return photoData }
+
+        guard let dataRepresentation = photo.fileDataRepresentation() else { return photoData }
+        filter.setValue(CIImage(data: dataRepresentation), forKey: kCIInputImageKey)
+        guard let renderedCIImage = filter.outputImage else { return photoData }
+
+        let outputimage = UIImage(ciImage: renderedCIImage, scale: 1, orientation: .right)
+        return outputimage.jpegData(compressionQuality: 1.0)
+    }
+
+    private func captureDidFinish(_ uniqueID: Int64) {
+        // When the capture is complete, remove a reference to
+        // the photo capture delegate so it can be deallocated
+        inProgressPhotoCaptureDelegates[uniqueID] = nil
+    }
 }
 
 // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
@@ -154,26 +176,29 @@ extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
                        didOutput sampleBuffer: CMSampleBuffer,
                        from connection: AVCaptureConnection) {
 
-        guard let videoPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
+        guard var videoPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
             let formatDescription = CMSampleBufferGetFormatDescription(sampleBuffer) else { return }
 
-        var finalVideoPixelBuffer = videoPixelBuffer
         /*
-         outputRetainedBufferCountHint is the number of pixel buffers the renderer retains. This value informs the renderer
-         how to size its buffer pool and how many pixel buffers to preallocate. Allow 3 frames of latency to cover the dispatch_async call.
+         outputRetainedBufferCountHint is the number of pixel buffers the renderer retains.
+         This value informs the renderer how to size its buffer pool and how many pixel
+         buffers to preallocate. Allow 3 frames of latency to cover the dispatch_async call.
          */
-        if !currentFilter.isPrepared {
-            currentFilter.prepare(with: formatDescription, outputRetainedBufferCountHint: 3)
+
+        if let currentFilter = currentFilter {
+            if !currentFilter.isPrepared {
+                currentFilter.prepare(with: formatDescription, outputRetainedBufferCountHint: 3)
+            }
+
+            // Send the pixel buffer through the filter
+            guard let filteredBuffer = currentFilter.render(pixelBuffer: videoPixelBuffer) else {
+                print("Unable to filter video buffer")
+                return
+            }
+
+            videoPixelBuffer = filteredBuffer
         }
 
-        // Send the pixel buffer through the filter
-        guard let filteredBuffer = currentFilter.render(pixelBuffer: finalVideoPixelBuffer) else {
-            print("Unable to filter video buffer")
-            return
-        }
-
-        finalVideoPixelBuffer = filteredBuffer
-
-        previewLayer?.pixelBuffer = finalVideoPixelBuffer
+        previewLayer?.pixelBuffer = videoPixelBuffer
     }
 }

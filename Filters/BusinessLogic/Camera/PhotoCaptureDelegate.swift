@@ -20,7 +20,8 @@ class PhotoCaptureProcessor: NSObject {
 
     private let willCapturePhotoAnimation: DefaultHandler?
     private let photoProcessingHandler: ((Bool) -> Void)?
-    private let completionHandler: (PhotoCaptureProcessor) -> Void
+    private let applyFilterHandler: ((AVCapturePhoto) -> Data?)?
+    private let completionHandler: (Int64) -> Void
 
     private var photoData: Data?
     private var maxPhotoProcessingTime: CMTime?
@@ -36,11 +37,13 @@ class PhotoCaptureProcessor: NSObject {
     init(with requestedPhotoSettings: AVCapturePhotoSettings,
          willCapturePhotoAnimation: DefaultHandler? = nil,
          photoProcessingHandler: ((_ isProcessingPhoto: Bool) -> Void)? = nil,
-         completionHandler: @escaping (PhotoCaptureProcessor) -> Void) {
+         applyFilterHandler: ((AVCapturePhoto) -> Data?)? = nil,
+         completionHandler: @escaping (Int64) -> Void) {
 
         self.requestedPhotoSettings = requestedPhotoSettings
         self.willCapturePhotoAnimation = willCapturePhotoAnimation
         self.photoProcessingHandler = photoProcessingHandler
+        self.applyFilterHandler = applyFilterHandler
         self.completionHandler = completionHandler
     }
 }
@@ -84,16 +87,7 @@ extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
                 return
             }
 
-            // Applying filter
-            self.photoData = photo.fileDataRepresentation()
-            let filter = CIFilter(name: "CICrystallize")
-
-            guard let dataRepresentation = photo.fileDataRepresentation() else { return }
-            filter?.setValue(CIImage(data: dataRepresentation), forKey: kCIInputImageKey)
-            guard let renderedCIImage = filter?.outputImage else { return }
-
-            let outputimage = UIImage(ciImage: renderedCIImage, scale: 1, orientation: .right)
-            self.photoData = outputimage.jpegData(compressionQuality: 1.0)
+            self.photoData = self.applyFilterHandler?(photo)
         }
     }
 
@@ -107,13 +101,13 @@ extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
 
             if let error = error {
                 print("Error capturing photo: \(error)")
-                self.completionHandler(self)
+                self.completionHandler(self.requestedPhotoSettings.uniqueID)
                 return
             }
 
             guard let photoData = self.photoData else {
                 print("No photo data resource")
-                self.completionHandler(self)
+                self.completionHandler(self.requestedPhotoSettings.uniqueID)
                 return
             }
 
@@ -132,10 +126,10 @@ extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
                             print("Error occurred while saving photo to photo library: \(error)")
                         }
 
-                        self.completionHandler(self)
+                        self.completionHandler(self.requestedPhotoSettings.uniqueID)
                     })
                 } else {
-                    self.completionHandler(self)
+                    self.completionHandler(self.requestedPhotoSettings.uniqueID)
                 }
             }
         }

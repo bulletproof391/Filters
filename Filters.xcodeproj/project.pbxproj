@@ -16,6 +16,7 @@
 		0A0EAB4B2396DDF600035AAE /* Msic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0EAB4A2396DDF600035AAE /* Msic.swift */; };
 		0A0EAB4E2396DF0400035AAE /* DefaultCIFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0EAB4D2396DF0400035AAE /* DefaultCIFilter.swift */; };
 		0A0EAB502396E99C00035AAE /* BufferAllocationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0EAB4F2396E99C00035AAE /* BufferAllocationHelper.swift */; };
+		0A2415EF2397069400AC437A /* CameraManager+CIFilters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2415EE2397069400AC437A /* CameraManager+CIFilters.swift */; };
 		0A38D3F523905DC200179218 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A38D3F423905DC200179218 /* CameraManager.swift */; };
 		0A82ED522393E4B300303798 /* PreviewMetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A82ED512393E4B300303798 /* PreviewMetalView.swift */; };
 		0A82ED562394067600303798 /* PassThrough.metal in Sources */ = {isa = PBXBuildFile; fileRef = 0A82ED552394067600303798 /* PassThrough.metal */; };
@@ -35,6 +36,7 @@
 		0A0EAB4A2396DDF600035AAE /* Msic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Msic.swift; sourceTree = "<group>"; };
 		0A0EAB4D2396DF0400035AAE /* DefaultCIFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultCIFilter.swift; sourceTree = "<group>"; };
 		0A0EAB4F2396E99C00035AAE /* BufferAllocationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BufferAllocationHelper.swift; sourceTree = "<group>"; };
+		0A2415EE2397069400AC437A /* CameraManager+CIFilters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CameraManager+CIFilters.swift"; sourceTree = "<group>"; };
 		0A38D3F423905DC200179218 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
 		0A82ED512393E4B300303798 /* PreviewMetalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewMetalView.swift; sourceTree = "<group>"; };
 		0A82ED552394067600303798 /* PassThrough.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = PassThrough.metal; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 			isa = PBXGroup;
 			children = (
 				0A38D3F423905DC200179218 /* CameraManager.swift */,
+				0A2415EE2397069400AC437A /* CameraManager+CIFilters.swift */,
 				0AC69D0C2392C91A009E8114 /* PhotoCaptureDelegate.swift */,
 			);
 			path = Camera;
@@ -252,6 +255,7 @@
 				0A82ED562394067600303798 /* PassThrough.metal in Sources */,
 				0A82ED522393E4B300303798 /* PreviewMetalView.swift in Sources */,
 				0A0B5C8A2390549D009FCC89 /* AppDelegate.swift in Sources */,
+				0A2415EF2397069400AC437A /* CameraManager+CIFilters.swift in Sources */,
 				0A38D3F523905DC200179218 /* CameraManager.swift in Sources */,
 				0A0EAB4B2396DDF600035AAE /* Msic.swift in Sources */,
 				0A0EAB4E2396DF0400035AAE /* DefaultCIFilter.swift in Sources */,
@@ -334,7 +338,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -388,7 +392,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
