@@ -26,7 +26,7 @@ final class FrontCameraViewController: UIViewController {
         configureViewController()
     }
 
-    // MARK: - Public methods
+    // MARK: - User action methods
 
     @IBAction func captureImage(_ sender: Any) {
         cameraManager.captureImage()
@@ -51,11 +51,11 @@ final class FrontCameraViewController: UIViewController {
 
     private func configurePreview() {
         let leftSwipeGesture = UISwipeGestureRecognizer(target: self,
-                                                        action: #selector(swipeGestureHandler(gestureRecognizer:)))
+                                                        action: #selector(handleSwipeGesture(gestureRecognizer:)))
         leftSwipeGesture.direction = .left
 
         let rightSwipeGesture = UISwipeGestureRecognizer(target: self,
-                                                         action: #selector(swipeGestureHandler(gestureRecognizer:)))
+                                                         action: #selector(handleSwipeGesture(gestureRecognizer:)))
         rightSwipeGesture.direction = .right
 
         cameraPreviewView.addGestureRecognizer(leftSwipeGesture)
@@ -67,9 +67,15 @@ final class FrontCameraViewController: UIViewController {
         captureImageButton.setTitle(nil)
         captureImageButton.backgroundColor = UIColor.white
         captureImageButton.layer.cornerRadius = captureImageButton.bounds.width / 2
+
+        let longTapGestureRecognizer = UILongPressGestureRecognizer(
+            target: self,
+            action: #selector(handleLongTapGesture(gestureRecognizer:))
+        )
+        captureImageButton.addGestureRecognizer(longTapGestureRecognizer)
     }
 
-    @objc private func swipeGestureHandler(gestureRecognizer: UISwipeGestureRecognizer) {
+    @objc private func handleSwipeGesture(gestureRecognizer: UISwipeGestureRecognizer) {
         switch gestureRecognizer.direction {
         case .left:
             cameraManager.applyFilter(direction: .next)
@@ -78,5 +84,34 @@ final class FrontCameraViewController: UIViewController {
         default:
             break
         }
+    }
+
+    @objc private func handleLongTapGesture(gestureRecognizer: UILongPressGestureRecognizer) {
+        switch gestureRecognizer.state {
+        case .began:
+            let enlargeTransform = CGAffineTransform(scaleX: Constant.scalingCoefficient,
+                                                     y: Constant.scalingCoefficient)
+            scaleButton(duration: Constant.animationDuration, affineTransform: enlargeTransform)
+
+        case .ended:
+            scaleButton(duration: Constant.animationDuration, affineTransform: .identity)
+
+        default:
+            break
+        }
+    }
+
+    private func scaleButton(duration: TimeInterval, affineTransform: CGAffineTransform) {
+        UIView.animate(withDuration: duration) { [weak self] in
+            guard let self = self else { return }
+            self.captureImageButton.transform = affineTransform
+        }
+    }
+}
+
+extension FrontCameraViewController {
+    enum Constant {
+        static let animationDuration: Double = 0.3
+        static let scalingCoefficient: CGFloat = 1.5
     }
 }
