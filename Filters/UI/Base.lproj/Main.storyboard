@@ -15,9 +15,26 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mcl-em-Cm8" customClass="CameraPreviewLayer" customModule="Filters" customModuleProvider="target">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mcl-em-Cm8" customClass="PreviewMetalView" customModule="Filters" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cyc-Pt-AjW">
+                                        <rect key="frame" x="182" y="822" width="50" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="PHa-VW-CXh"/>
+                                            <constraint firstAttribute="width" constant="50" id="vaF-Kp-heZ"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <connections>
+                                            <action selector="captureImage:" destination="BYZ-38-t0r" eventType="touchUpInside" id="a6I-lY-bHX"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstItem="cyc-Pt-AjW" firstAttribute="centerX" secondItem="Mcl-em-Cm8" secondAttribute="centerX" id="q8Z-Ed-gUw"/>
+                                    <constraint firstAttribute="bottom" secondItem="cyc-Pt-AjW" secondAttribute="bottom" constant="24" id="sQx-J7-xJc"/>
+                                </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
@@ -31,6 +48,7 @@
                     </view>
                     <connections>
                         <outlet property="cameraPreviewView" destination="Mcl-em-Cm8" id="mPg-1T-GvT"/>
+                        <outlet property="captureImageButton" destination="cyc-Pt-AjW" id="Mxm-x2-Txq"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

@@ -7,12 +7,34 @@
 //
 
 import AVFoundation
+import Photos
 import UIKit
 
-final class CameraManager {
+// swiftlint:disable force_unwrapping
+final class CameraManager: NSObject {
+
+    // MARK: - Private proeprties
 
     let captureSession = AVCaptureSession()
-    weak var previewLayer: AVCaptureVideoPreviewLayer?
+    weak var previewLayer: PreviewMetalView?
+
+    // TODO: Remove later
+    var currentFilter = DefaultCIFilter(ciContext: CIContext(), filterName: "CICrystallize")
+
+    // MARK: - Private proeprties
+
+    private var dataOutputQueue = DispatchQueue(label: "OutputQueue",
+                                                qos: .userInitiated,
+                                                attributes: [],
+                                                autoreleaseFrequency: .workItem)
+
+    private var videoDeviceInput: AVCaptureDeviceInput!
+    private var photoOutput: AVCapturePhotoOutput!
+    private var videoOutput: AVCaptureVideoDataOutput!
+    private var authorizationStatus: AVAuthorizationStatus {
+        return AVCaptureDevice.authorizationStatus(for: .video)
+    }
+    private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
 
     // MARK: - Public methods
 
@@ -43,14 +65,47 @@ final class CameraManager {
         }
     }
 
+    func captureImage() {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+
+            let photoSettings = AVCapturePhotoSettings()
+            photoSettings.isHighResolutionPhotoEnabled = true
+            photoSettings.photoQualityPrioritization = .balanced
+
+            let photoCaptureProcessor = PhotoCaptureProcessor(
+                with: photoSettings,
+                willCapturePhotoAnimation: {
+                    // Flash the screen to signal that AVCam took a photo.
+                    DispatchQueue.main.async {
+                        self.previewLayer?.layer.opacity = 0
+                        UIView.animate(withDuration: 0.25) {
+                            self.previewLayer?.layer.opacity = 1
+                        }
+                    }
+                },
+                completionHandler: { photoCaptureProcessor in
+                    // When the capture is complete, remove a reference to the photo capture delegate so it can be deallocated
+                    self.inProgressPhotoCaptureDelegates[photoCaptureProcessor.requestedPhotoSettings.uniqueID] = nil
+                }
+            )
+
+            let instanceId = photoCaptureProcessor.requestedPhotoSettings.uniqueID
+            self.inProgressPhotoCaptureDelegates[instanceId] = photoCaptureProcessor
+            self.photoOutput.capturePhoto(with: photoSettings, delegate: photoCaptureProcessor)
+        }
+    }
+
     // MARK: - Private methods
 
     private func setupCaptureSession() {
         captureSession.beginConfiguration()
-        guard setupInput(for: captureSession) && setupOutput(for: captureSession) else { return }
-        captureSession.commitConfiguration()
+        captureSession.sessionPreset = AVCaptureSession.Preset.photo
 
-        previewLayer?.session = captureSession
+        guard setupInput(for: captureSession)
+            && setupPhotoOutput(for: captureSession)
+            && setupVideoOutput(for: captureSession) else { return }
+        captureSession.commitConfiguration()
 
         DispatchQueue.main.async { [weak self] in
             self?.captureSession.startRunning()
@@ -58,7 +113,6 @@ final class CameraManager {
     }
 
     private func setupInput(for session: AVCaptureSession) -> Bool {
-        // add input
         guard
             let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera,
                                                       for: .video,
@@ -66,17 +120,60 @@ final class CameraManager {
             let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice),
             session.canAddInput(videoDeviceInput) else { return false }
 
+        self.videoDeviceInput = videoDeviceInput
         session.addInput(videoDeviceInput)
         return true
     }
 
-    private func setupOutput(for session: AVCaptureSession) -> Bool {
-        // add output
-        let photoOutput = AVCapturePhotoOutput()
+    private func setupPhotoOutput(for session: AVCaptureSession) -> Bool {
+        photoOutput = AVCapturePhotoOutput()
+        photoOutput.isHighResolutionCaptureEnabled = true
+
         guard session.canAddOutput(photoOutput) else { return false }
-        session.sessionPreset = .photo
         session.addOutput(photoOutput)
 
         return true
+    }
+
+    private func setupVideoOutput(for session: AVCaptureSession) -> Bool {
+        videoOutput = AVCaptureVideoDataOutput()
+        videoOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)]
+        videoOutput.setSampleBufferDelegate(self, queue: dataOutputQueue)
+
+        guard session.canAddOutput(videoOutput) else { return false }
+        session.addOutput(videoOutput)
+
+        return true
+    }
+}
+
+// MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
+
+extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
+    func captureOutput(_ output: AVCaptureOutput,
+                       didOutput sampleBuffer: CMSampleBuffer,
+                       from connection: AVCaptureConnection) {
+
+        guard let videoPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer),
+            let formatDescription = CMSampleBufferGetFormatDescription(sampleBuffer) else { return }
+
+        var finalVideoPixelBuffer = videoPixelBuffer
+        /*
+         outputRetainedBufferCountHint is the number of pixel buffers the renderer retains. This value informs the renderer
+         how to size its buffer pool and how many pixel buffers to preallocate. Allow 3 frames of latency to cover the dispatch_async call.
+         */
+        if !currentFilter.isPrepared {
+            currentFilter.prepare(with: formatDescription, outputRetainedBufferCountHint: 3)
+        }
+
+        // Send the pixel buffer through the filter
+        guard let filteredBuffer = currentFilter.render(pixelBuffer: finalVideoPixelBuffer) else {
+            print("Unable to filter video buffer")
+            return
+        }
+
+        finalVideoPixelBuffer = filteredBuffer
+
+        previewLayer?.pixelBuffer = finalVideoPixelBuffer
     }
 }
