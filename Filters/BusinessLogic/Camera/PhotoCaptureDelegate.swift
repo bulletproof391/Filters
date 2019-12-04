@@ -10,10 +10,11 @@ import AVFoundation
 import Photos
 import UIKit
 
-class PhotoCaptureProcessor: NSObject {
+final class PhotoCaptureProcessor: NSObject {
 
     // MARK: - Public properties
 
+    var photoLibraryManager: PhotoLibraryManager?
     private(set) var requestedPhotoSettings: AVCapturePhotoSettings
 
     // MARK: - Private properties
@@ -112,26 +113,12 @@ extension PhotoCaptureProcessor: AVCapturePhotoCaptureDelegate {
             }
 
             // Saving photo to library
-            PHPhotoLibrary.requestAuthorization { status in
-                if status == .authorized {
-                    PHPhotoLibrary.shared().performChanges({
-                        let options = PHAssetResourceCreationOptions()
-                        let creationRequest = PHAssetCreationRequest.forAsset()
-
-                        options.uniformTypeIdentifier = self.requestedPhotoSettings.processedFileType.map { $0.rawValue }
-                        creationRequest.addResource(with: .photo, data: photoData, options: options)
-
-                    }, completionHandler: { _, error in
-                        if let error = error {
-                            print("Error occurred while saving photo to photo library: \(error)")
-                        }
-
-                        self.completionHandler(self.requestedPhotoSettings.uniqueID)
-                    })
-                } else {
-                    self.completionHandler(self.requestedPhotoSettings.uniqueID)
-                }
+            let uniformTypeIdentifier = self.requestedPhotoSettings.processedFileType.map { $0.rawValue }
+            self.photoLibraryManager?.onProcessFinished = {
+                self.completionHandler(self.requestedPhotoSettings.uniqueID)
             }
+            self.photoLibraryManager?.savePhoto(uniformTypeIdentifier: uniformTypeIdentifier,
+                                                photoData: photoData)
         }
     }
 }
