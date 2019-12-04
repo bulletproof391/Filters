@@ -18,6 +18,7 @@
 		0A0EAB502396E99C00035AAE /* BufferAllocationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0EAB4F2396E99C00035AAE /* BufferAllocationHelper.swift */; };
 		0A2415EF2397069400AC437A /* CameraManager+CIFilters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2415EE2397069400AC437A /* CameraManager+CIFilters.swift */; };
 		0A38D3F523905DC200179218 /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A38D3F423905DC200179218 /* CameraManager.swift */; };
+		0A59B1C72398452E00DD0F6D /* PhotoLibraryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A59B1C62398452E00DD0F6D /* PhotoLibraryManager.swift */; };
 		0A82ED522393E4B300303798 /* PreviewMetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A82ED512393E4B300303798 /* PreviewMetalView.swift */; };
 		0A82ED562394067600303798 /* PassThrough.metal in Sources */ = {isa = PBXBuildFile; fileRef = 0A82ED552394067600303798 /* PassThrough.metal */; };
 		0AC69D0B2392B724009E8114 /* UIButton+Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC69D0A2392B724009E8114 /* UIButton+Appearance.swift */; };
@@ -38,6 +39,7 @@
 		0A0EAB4F2396E99C00035AAE /* BufferAllocationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BufferAllocationHelper.swift; sourceTree = "<group>"; };
 		0A2415EE2397069400AC437A /* CameraManager+CIFilters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CameraManager+CIFilters.swift"; sourceTree = "<group>"; };
 		0A38D3F423905DC200179218 /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		0A59B1C62398452E00DD0F6D /* PhotoLibraryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryManager.swift; sourceTree = "<group>"; };
 		0A82ED512393E4B300303798 /* PreviewMetalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewMetalView.swift; sourceTree = "<group>"; };
 		0A82ED552394067600303798 /* PassThrough.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = PassThrough.metal; sourceTree = "<group>"; };
 		0AC69D0A2392B724009E8114 /* UIButton+Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Appearance.swift"; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 		0A38D3F323905DB200179218 /* BusinessLogic */ = {
 			isa = PBXGroup;
 			children = (
+				0A59B1C5239844F500DD0F6D /* Gallery */,
 				0A38D3F62390659800179218 /* Camera */,
 				0A0EAB4C2396DECF00035AAE /* CIFilters */,
 			);
@@ -129,6 +132,14 @@
 				0AC69D0C2392C91A009E8114 /* PhotoCaptureDelegate.swift */,
 			);
 			path = Camera;
+			sourceTree = "<group>";
+		};
+		0A59B1C5239844F500DD0F6D /* Gallery */ = {
+			isa = PBXGroup;
+			children = (
+				0A59B1C62398452E00DD0F6D /* PhotoLibraryManager.swift */,
+			);
+			path = Gallery;
 			sourceTree = "<group>";
 		};
 		0A82ED542394066100303798 /* Metal */ = {
@@ -261,6 +272,7 @@
 				0A0EAB4E2396DF0400035AAE /* DefaultCIFilter.swift in Sources */,
 				0A0B5C8C2390549D009FCC89 /* SceneDelegate.swift in Sources */,
 				0AC69D0D2392C91A009E8114 /* PhotoCaptureDelegate.swift in Sources */,
+				0A59B1C72398452E00DD0F6D /* PhotoLibraryManager.swift in Sources */,
 				0A0EAB502396E99C00035AAE /* BufferAllocationHelper.swift in Sources */,
 				0AC69D0B2392B724009E8114 /* UIButton+Appearance.swift in Sources */,
 			);

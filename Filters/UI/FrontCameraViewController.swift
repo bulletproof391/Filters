@@ -43,10 +43,6 @@ final class FrontCameraViewController: UIViewController {
     private func prepareCameraUsage() {
         cameraManager.previewLayer = cameraPreviewView
         cameraManager.initFilters(with: FilterName.allCases.map { String($0.rawValue) })
-
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.cameraManager.checkAuthorizationStatus()
-        }
     }
 
     private func configurePreview() {

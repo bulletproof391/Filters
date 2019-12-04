@@ -6,6 +6,7 @@
 //  Copyright © 2019 Dmitry Vashlaev. All rights reserved.
 //
 
+import Foundation
 import AVFoundation
 import Photos
 import UIKit
@@ -22,7 +23,7 @@ final class CameraManager: NSObject, CameraManagerable {
 
     let captureSession = AVCaptureSession()
     weak var previewLayer: PreviewMetalView?
-    
+
     var currentFilter: DefaultCIFilter?
     var ciFilters = [DefaultCIFilter]()
     var filterIndex: Int = 0
@@ -40,21 +41,33 @@ final class CameraManager: NSObject, CameraManagerable {
     private var authorizationStatus: AVAuthorizationStatus {
         return AVCaptureDevice.authorizationStatus(for: .video)
     }
+    private var shouldSetupCaptureSession: Bool {
+        return videoDeviceInput == nil || photoOutput == nil || videoOutput == nil
+    }
     private var inProgressPhotoCaptureDelegates = [Int64: PhotoCaptureProcessor]()
+    private let photoLibraryManager = PhotoLibraryManager()
+
+    // MARK: Initializers
+
+    override init() {
+        super.init()
+        observeAppStateChanges()
+    }
 
     // MARK: - Public methods
 
-    func checkAuthorizationStatus() {
-        switch AVCaptureDevice.authorizationStatus(for: .video) {
+    @objc func checkAuthorizationStatus() {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            switch AVCaptureDevice.authorizationStatus(for: .video) {
             // The user has previously granted access to the camera
             case .authorized:
-                setupCaptureSession()
+                self?.continueCaptureSession()
 
             // The user has not yet been asked for camera access
             case .notDetermined:
                 AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
                     guard granted else { return }
-                    self?.setupCaptureSession()
+                    self?.continueCaptureSession()
                 }
 
             // The user has previously denied access
@@ -65,13 +78,16 @@ final class CameraManager: NSObject, CameraManagerable {
             case .restricted:
                 return
 
-        @unknown default:
-            assertionFailure("Please supplement switch-case statement")
-            return
+            @unknown default:
+                assertionFailure("Please supplement switch-case statement")
+                return
+            }
         }
     }
 
     func captureImage() {
+        guard case .authorized = AVCaptureDevice.authorizationStatus(for: .video) else { return }
+
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self = self else { return }
 
@@ -83,6 +99,7 @@ final class CameraManager: NSObject, CameraManagerable {
                                                               willCapturePhotoAnimation: self.animatePhotoCapture,
                                                               applyFilterHandler: self.applyFilter,
                                                               completionHandler: self.captureDidFinish)
+            photoCaptureProcessor.photoLibraryManager = self.photoLibraryManager
 
             let instanceId = photoCaptureProcessor.requestedPhotoSettings.uniqueID
             self.inProgressPhotoCaptureDelegates[instanceId] = photoCaptureProcessor
@@ -92,6 +109,33 @@ final class CameraManager: NSObject, CameraManagerable {
 
     // MARK: - Private methods
 
+    // Entry point of Camera handling
+    private func observeAppStateChanges() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(checkAuthorizationStatus),
+                                               name: UIApplication.didBecomeActiveNotification,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(stopCaptureSession),
+                                               name: UIApplication.didEnterBackgroundNotification,
+                                               object: nil)
+    }
+
+    @objc private func stopCaptureSession() {
+        captureSession.stopRunning()
+    }
+
+    @objc private func continueCaptureSession() {
+        if shouldSetupCaptureSession {
+            setupCaptureSession()
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            self?.captureSession.startRunning()
+        }
+    }
+
     private func setupCaptureSession() {
         captureSession.beginConfiguration()
         captureSession.sessionPreset = AVCaptureSession.Preset.photo
@@ -100,10 +144,6 @@ final class CameraManager: NSObject, CameraManagerable {
             && setupPhotoOutput(for: captureSession)
             && setupVideoOutput(for: captureSession) else { return }
         captureSession.commitConfiguration()
-
-        DispatchQueue.main.async { [weak self] in
-            self?.captureSession.startRunning()
-        }
     }
 
     private func setupInput(for session: AVCaptureSession) -> Bool {

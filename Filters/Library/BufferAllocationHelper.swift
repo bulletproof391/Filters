@@ -72,7 +72,10 @@ final class BufferAllocationHelper {
             var pixelBuffer: CVPixelBuffer?
             var outputFormatDescription: CMFormatDescription?
             let auxAttributes = [kCVPixelBufferPoolAllocationThresholdKey as String: outputRetainedBufferCountHint] as NSDictionary
-            CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(kCFAllocatorDefault, pixelBufferPool, auxAttributes, &pixelBuffer)
+            CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(kCFAllocatorDefault,
+                                                                pixelBufferPool,
+                                                                auxAttributes,
+                                                                &pixelBuffer)
             if let pixelBuffer = pixelBuffer {
                 CMVideoFormatDescriptionCreateForImageBuffer(allocator: kCFAllocatorDefault,
                                                              imageBuffer: pixelBuffer,
@@ -90,7 +93,10 @@ final class BufferAllocationHelper {
         let auxAttributes = [kCVPixelBufferPoolAllocationThresholdKey as String: allocationThreshold] as NSDictionary
         var pixelBuffer: CVPixelBuffer?
         while error == kCVReturnSuccess {
-            error = CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(kCFAllocatorDefault, pool, auxAttributes, &pixelBuffer)
+            error = CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(kCFAllocatorDefault,
+                                                                        pool,
+                                                                        auxAttributes,
+                                                                        &pixelBuffer)
             if let pixelBuffer = pixelBuffer {
                 pixelBuffers.append(pixelBuffer)
             }
